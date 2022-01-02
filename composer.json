@@ -1,0 +1,24 @@
+{
+    "name": "ekok/php-utils",
+    "description": "PHP Utilities",
+    "type": "library",
+    "require": {
+        "php": ">=8.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ekok\\Utils\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Eko Kurniawan",
+            "email": "setiawanegho@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
+}
