@@ -3,6 +3,7 @@
 namespace Ekok\Utils\Tests;
 
 use Ekok\Utils\Arr;
+use Ekok\Utils\Payload;
 use PHPUnit\Framework\TestCase;
 
 class ArrTest extends TestCase
@@ -11,16 +12,17 @@ class ArrTest extends TestCase
     {
         $src = array('foo', 'bar', 'baz');
 
-        $this->assertEquals($src, Arr::each($src, fn($item) => $item));
-        $this->assertEquals(array('f', 'b', 'b'), Arr::each($src, fn($item) => substr($item->value, 0, 1)));
-        $this->assertEquals(array('foo', 'baz'), Arr::each($src, fn($item) => $item->value === 'bar' ? $item->value(null) : $item->key(null), true));
+        $this->assertEquals($src, Arr::each($src, fn(Payload $item) => $item));
+        $this->assertEquals(array('f', 'b', 'b'), Arr::each($src, fn(Payload $item) => substr($item->value, 0, 1)));
+        $this->assertEquals(array('foo', 'baz'), Arr::each($src, fn(Payload $item) => $item->value === 'bar' ? $item->value(null) : $item->key(null), true));
     }
 
     public function testFilter()
     {
         $src = array('foo' => 1, 'one');
 
-        $this->assertEquals($src, Arr::filter($src + array('x' => false), fn($item) => ($item->keyType('string') || $item->valType('string')) && $item->value));
+        $this->assertEquals($src, Arr::filter($src + array('x' => false), fn(Payload $item) => ($item->keyType('string') || $item->valType('string')) && $item->value));
+        $this->assertEquals(array('one'), Arr::filter($src, fn(Payload $item) => $item->indexed()));
     }
 
     public function testWalk()
@@ -28,7 +30,7 @@ class ArrTest extends TestCase
         $expected = array('foo', 'bar', 'baz');
         $actual = array();
 
-        Arr::walk($expected, function ($item) use (&$actual) {
+        Arr::walk($expected, function (Payload $item) use (&$actual) {
             $actual[] = $item->value;
         });
 
@@ -37,22 +39,22 @@ class ArrTest extends TestCase
 
     public function testSome()
     {
-        $this->assertTrue(Arr::some(array('foo', 'bar'), fn ($item) => $item->value === 'bar', $actual));
+        $this->assertTrue(Arr::some(array('foo', 'bar'), fn (Payload $item) => $item->value === 'bar', $actual));
         $this->assertEquals('bar', $actual);
-        $this->assertFalse(Arr::some(array('foo', 'bar'), fn ($item) => $item->value === 'baz'));
+        $this->assertFalse(Arr::some(array('foo', 'bar'), fn (Payload $item) => $item->value === 'baz'));
     }
 
     public function testEvery()
     {
-        $this->assertTrue(Arr::every(array('foo', 'bar'), fn ($item) => !!$item->value));
-        $this->assertFalse(Arr::every(array('foo', 'bar'), fn ($item) => $item->value === 'foo'));
+        $this->assertTrue(Arr::every(array('foo', 'bar'), fn (Payload $item) => !!$item->value));
+        $this->assertFalse(Arr::every(array('foo', 'bar'), fn (Payload $item) => $item->value === 'foo'));
     }
 
     public function testFirst()
     {
         $expected = 'foo';
-        $actual = Arr::first(array('foo', 'bar'), fn($item) => $item);
-        $second = Arr::first(array(null), fn($item) => $item);
+        $actual = Arr::first(array('foo', 'bar'), fn(Payload $item) => $item);
+        $second = Arr::first(array(null), fn(Payload $item) => $item);
 
         $this->assertSame($expected, $actual);
         $this->assertNull($second);
@@ -61,7 +63,7 @@ class ArrTest extends TestCase
     public function testReduce()
     {
         $expected = '1,2,3,4,5';
-        $actual = Arr::reduce(range(1, 5), fn ($prev, $item) => $prev . ($item->key > 0 ? ',' : '') . $item->value);
+        $actual = Arr::reduce(range(1, 5), fn ($prev, Payload $item) => $prev . ($item->key > 0 ? ',' : '') . $item->value);
 
         $this->assertSame($expected, $actual);
     }

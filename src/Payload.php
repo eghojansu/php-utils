@@ -21,6 +21,11 @@ class Payload
         return $type ? $type === gettype($this->key) : gettype($this->key);
     }
 
+    public function indexed(): bool
+    {
+        return is_numeric($this->key);
+    }
+
     public function commit($value): static
     {
         if (null === $this->key || '' === $this->key) {
