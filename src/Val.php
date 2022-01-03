@@ -23,9 +23,13 @@ class Val
             return $var;
         }
 
-        $parts = array_map(split($key, '.'));
+        $parts = explode('.', $key);
 
         foreach ($parts as $part) {
+            if ('' === $part) {
+                continue;
+            }
+
             if (null === $var || is_scalar($var)) {
                 $var = array();
             }

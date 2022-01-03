@@ -21,13 +21,35 @@ class Payload
         return $type ? $type === gettype($this->key) : gettype($this->key);
     }
 
+    public function commit($value): static
+    {
+        if (null === $this->key || '' === $this->key) {
+            $this->result[] = $value;
+        } else {
+            $this->result[$this->key] = $value;
+        }
+
+        return $this;
+    }
+
     public function update($value, $key = null): static
     {
         $this->value = $value;
+        $this->key = $key;
 
-        if (null !== $key) {
-            $this->key = $key;
-        }
+        return $this;
+    }
+
+    public function value($value): static
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function key($key): static
+    {
+        $this->key = $key;
 
         return $this;
     }

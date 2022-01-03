@@ -6,12 +6,12 @@ class Str
 {
     public static function fixslashes(string $str): string
     {
-        return preg_replace('#[/\\]+#', '/', $str);
+        return preg_replace('/[\/\\\\]+/', '/', $str);
     }
 
-    public static function split(string $str, string $symbols = ',;|'): array
+    public static function split(string $str, string $symbols = null): array
     {
-        return preg_split('/[' . $symbols . ']/i', $str, 0, PREG_SPLIT_NO_EMPTY);
+        return preg_split('/[' . ($symbols ?? ',;|') . ']/i', $str, 0, PREG_SPLIT_NO_EMPTY);
     }
 
     public static function quote(string $text, string $open = '"', string $close = null, string $delimiter = '.'): string
@@ -32,24 +32,20 @@ class Str
         return strtolower(preg_replace('/\p{Lu}/', '_$0', lcfirst($text)));
     }
 
-    public static function random(int $len = 8, string $salt = null): string
+    public static function random(int $len = 8, bool $lower = true, string $salt = null): string
     {
         $min = max(4, min(128, $len));
+        $pattern = $lower ? "#(*UTF8)[^A-Za-z0-9]#" : "#(*UTF8)[^A-Z0-9]#";
         $saltiness = $salt ?? bin2hex(random_bytes($len));
 
         do {
             $hex = md5($saltiness . uniqid('', true));
             $pack = pack('H*', $hex);
             $tmp = base64_encode($pack);
-            $uid = preg_replace("#(*UTF8)[^A-Za-z0-9]#", '', $tmp);
+            $uid = preg_replace($pattern, '', $tmp);
         } while (strlen($uid) < $min);
 
         return substr($uid, 0, $min);
-    }
-
-    public static function random_up(int $len = 8, string $salt = null): string
-    {
-        return strtoupper(random($len, $salt));
     }
 
     public static function cast(string $value): int|float|bool|string|array|null

@@ -10,13 +10,26 @@ class Arr
 
         foreach ($payload->items as $key => $value) {
             $result = $cb($payload->update($value, $key));
-            $update = null === $value || $result instanceof Payload ? $payload->value : $value;
+            $update = $result instanceof Payload ? $payload->value : $result;
 
             if ($skipNulls && null === $update) {
                 continue;
             }
 
-            $payload->result[$payload->key] = $update;
+            $payload->commit($update);
+        }
+
+        return $payload->result;
+    }
+
+    public static function filter(iterable $items, callable $cb): array
+    {
+        $payload = new Payload($items);
+
+        foreach ($payload->items as $key => $value) {
+            if ($cb($payload->update($value, $key))) {
+                $payload->commit($payload->value);
+            }
         }
 
         return $payload->result;
@@ -27,7 +40,7 @@ class Arr
         $payload = new Payload($items);
 
         foreach ($payload->items as $key => $value) {
-            $cb($payload->with($value, $key));
+            $cb($payload->update($value, $key));
         }
     }
 
@@ -37,7 +50,7 @@ class Arr
         $last = null;
 
         foreach ($payload->items as $key => $value) {
-            if ($cb($payload->with($value, $key))) {
+            if ($cb($payload->update($value, $key))) {
                 $last = $payload->value;
 
                 return true;
@@ -52,7 +65,7 @@ class Arr
         $payload = new Payload($items);
 
         foreach ($payload->items as $key => $value) {
-            if (!$cb($payload->with($value, $key))) {
+            if (!$cb($payload->update($value, $key))) {
                 return false;
             }
         }
@@ -60,12 +73,28 @@ class Arr
         return true;
     }
 
+    public static function first(iterable $items, callable $cb)
+    {
+        $payload = new Payload($items);
+
+        foreach ($payload->items as $key => $value) {
+            $result = $cb($payload->update($value, $key));
+            $update = $result instanceof Payload ? $payload->value : $result;
+
+            if (null !== $update) {
+                return $update;
+            }
+        }
+
+        return null;
+    }
+
     public static function reduce(iterable $items, callable $cb, $carry = null)
     {
         $payload = new Payload($items);
 
         foreach ($payload->items as $key => $value) {
-            $carry = $callback($carry, $cb($payload->with($value, $key)));
+            $carry = $cb($carry, $payload->update($value, $key));
         }
 
         return $carry;
@@ -89,8 +118,8 @@ class Arr
         return array_diff_key($items ?? array(), array_fill_keys($keys, null));
     }
 
-    public static function ensure(array|string $items, string $sep = ',;|'): array
+    public static function ensure(array|string $items, string $symbols = null): array
     {
-        return is_string($arr) ? Str::split($arr, $sep) : $arr;
+        return is_string($items) ? Str::split($items, $symbols) : $items;
     }
 }
