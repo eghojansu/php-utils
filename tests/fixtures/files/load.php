@@ -1,3 +1,3 @@
 <?php
 
-return 'ok';
+return $return;

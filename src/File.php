@@ -16,8 +16,16 @@ class File
         return is_dir($path) ? true : mkdir($path, $permissions, $recursive);
     }
 
-    public static function load(string $file, bool &$exists = null)
+    public static function load(string $file, array $data = null, bool &$exists = null)
     {
-        return ($exists = is_file($file)) ? require $file : null;
+        if ($exists = is_file($file)) {
+            return (static function () {
+                extract(func_get_arg(0));
+
+                return require func_get_arg(1);
+            })($data ?? array(), $file);
+        }
+
+        return null;
     }
 }
