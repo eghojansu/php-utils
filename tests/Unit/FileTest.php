@@ -30,5 +30,10 @@ class FileTest extends TestCase
         unlink($file);
         $this->assertTrue(File::touch($file, 'bar'));
         $this->assertSame('bar', file_get_contents($file));
+
+        $this->assertSame('ok', File::load(TEST_FIXTURES . '/files/load.php', $exists));
+        $this->assertTrue($exists);
+        $this->assertNull(File::load('__none__.php', $exists));
+        $this->assertFalse($exists);
     }
 }
