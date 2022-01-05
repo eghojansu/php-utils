@@ -127,4 +127,18 @@ class StrTest extends TestCase
         $this->assertSame(null, Str::cast('null'));
         $this->assertSame('1_234_567', Str::cast('1_234_567'));
     }
+
+    public function testStartsWith()
+    {
+        $this->assertSame('foo', Str::startsWith('foobar', 'foo'));
+        $this->assertSame('foo', Str::startsWith('foobar', 'bar', 'foo'));
+        $this->assertNull(Str::startsWith('foobar', 'bar'));
+    }
+
+    public function testEndsWith()
+    {
+        $this->assertSame('bar', Str::endsWith('foobar', 'bar'));
+        $this->assertSame('bar', Str::endsWith('foobar', 'foo', 'bar'));
+        $this->assertNull(Str::endsWith('foobar', 'foo'));
+    }
 }

@@ -78,4 +78,14 @@ class Str
 
         return $val;
     }
+
+    public static function startsWith(string $str, string ...$prefixes): string|null
+    {
+        return Arr::some($prefixes, static fn(Payload $prefix) => str_starts_with($str, $prefix->value), $match) ? $match : null;
+    }
+
+    public static function endsWith(string $str, string ...$suffixes): string|null
+    {
+        return Arr::some($suffixes, static fn(Payload $suffix) => str_ends_with($str, $suffix->value), $match) ? $match : null;
+    }
 }

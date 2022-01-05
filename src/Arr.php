@@ -127,4 +127,9 @@ class Arr
     {
         return is_string($items) ? Str::split($items, $symbols) : $items;
     }
+
+    public static function fill(array|string $items, $value = true, string $symbols = null): array
+    {
+        return array_fill_keys(static::ensure($items, $symbols), $value);
+    }
 }

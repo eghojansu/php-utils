@@ -93,4 +93,12 @@ class ArrTest extends TestCase
         $this->assertSame($expected, $actual);
         $this->assertSame($expected, $actual2);
     }
+
+    public function testFill()
+    {
+        $expected = array('1' => true, '2' => true, '3' => true);
+        $actual = Arr::fill('1,2,3,');
+
+        $this->assertSame($expected, $actual);
+    }
 }
