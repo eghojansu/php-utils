@@ -28,24 +28,24 @@ class ValTest extends TestCase
         );
         $copy = $source;
 
-        $this->assertEquals($source['foo'], Val::ref('foo', $source, false, $exists, $parts));
-        $this->assertEquals(array('foo'), $parts);
+        $this->assertSame($source['foo'], Val::ref('foo', $source, false, $exists, $parts));
+        $this->assertSame(array('foo'), $parts);
         $this->assertTrue($exists);
         // get ref with extra dot (invalid)
-        $this->assertEquals($source['foo'], Val::ref('foo.', $source));
+        $this->assertSame($source['foo'], Val::ref('foo.', $source));
 
-        $this->assertEquals(null, Val::ref('unknown', $source));
-        $this->assertEquals(null, Val::ref(1, $source, false, $exists, $parts));
-        $this->assertEquals(array(1), $parts);
+        $this->assertNull(Val::ref('unknown', $source));
+        $this->assertNull(Val::ref(1, $source, false, $exists, $parts));
+        $this->assertSame(array(1), $parts);
         $this->assertFalse($exists);
         $this->assertEquals($copy, $source);
 
-        $this->assertEquals($source['foo']['bar'], Val::ref('foo.bar', $source, false, $exists, $parts));
-        $this->assertEquals(array('foo', 'bar'), $parts);
+        $this->assertSame($source['foo']['bar'], Val::ref('foo.bar', $source, false, $exists, $parts));
+        $this->assertSame(array('foo', 'bar'), $parts);
         $this->assertTrue($exists);
 
-        $this->assertEquals(null, Val::ref('foo.unknown.member', $source, false, $exists, $parts));
-        $this->assertEquals(array('foo', 'unknown', 'member'), $parts);
+        $this->assertSame(null, Val::ref('foo.unknown.member', $source, false, $exists, $parts));
+        $this->assertSame(array('foo', 'unknown', 'member'), $parts);
         $this->assertFalse($exists);
 
         $this->assertEquals('foobar', Val::ref('foo.string', $source, false, $exists, $parts));
@@ -95,6 +95,23 @@ class ValTest extends TestCase
         if (is_resource($copy['foo']['tmp'])) {
             fclose($copy['foo']['tmp']);
         }
+    }
+
+    public function testRefEscaping()
+    {
+        $src = array(
+            'foo' => array(
+                'bar.baz' => 'qux',
+            ),
+        );
+
+        $this->assertSame('qux', Val::ref('foo.bar\.baz', $src, false, $exists, $parts));
+        $this->assertTrue($exists);
+        $this->assertSame(array('foo', 'bar.baz'), $parts);
+
+        $this->assertSame(array('bar.baz' => 'qux'), Val::ref('foo', $src, false, $exists, $parts));
+        $this->assertTrue($exists);
+        $this->assertSame(array('foo'), $parts);
     }
 
     public function testUnref()

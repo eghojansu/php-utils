@@ -4,6 +4,11 @@ namespace Ekok\Utils;
 
 class Arr
 {
+    public static function exists(\ArrayAccess|array $items, $key): bool
+    {
+        return isset($items[$key]) || (is_array($items) && array_key_exists($key, $items));
+    }
+
     public static function each(iterable $items, callable $cb, bool $skipNulls = false): array
     {
         $payload = new Payload($items);
