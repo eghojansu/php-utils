@@ -32,6 +32,18 @@ class Str
         return strtolower(preg_replace('/\p{Lu}/', '_$0', lcfirst($text)));
     }
 
+    public static function casePascal(string $text): string
+    {
+        return ucfirst(static::caseCamel($text));
+    }
+
+    public static function className(string $fns, bool $snake = false): string
+    {
+        $className = ltrim(strrchr('\\' . $fns, '\\'), '\\');
+
+        return $snake ? static::caseSnake($className) : $className;
+    }
+
     public static function random(int $len = 8, bool $lower = true, string $salt = null): string
     {
         $min = max(4, min(128, $len));

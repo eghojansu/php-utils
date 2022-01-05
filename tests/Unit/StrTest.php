@@ -82,6 +82,29 @@ class StrTest extends TestCase
         );
     }
 
+    /** @dataProvider casePascalProvider */
+    public function testPascalCamel(string $expected, ...$arguments)
+    {
+        $actual = Str::casePascal(...$arguments);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function casePascalProvider()
+    {
+        return array(
+            array('PascalCase', 'pascal_case'),
+            array('PascalCase', 'Pascal_Case'),
+        );
+    }
+
+    public function testClassName()
+    {
+        $this->assertSame('FooBar', Str::className('FooBar'));
+        $this->assertSame('FooBar', Str::className('Test\\FooBar'));
+        $this->assertSame('foo_bar', Str::className('FooBar', true));
+    }
+
     public function testRandom()
     {
         $this->assertNotEquals(Str::random(), Str::random());
