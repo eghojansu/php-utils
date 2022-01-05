@@ -117,17 +117,6 @@ class StrTest extends TestCase
         $this->assertTrue(!preg_match('/[[:lower:]]/', Str::random(8, false)));
     }
 
-    public function testCast()
-    {
-        $this->assertSame(1234, Str::cast('1234'));
-        $this->assertSame(83, Str::cast('0123'));
-        $this->assertSame(26, Str::cast('0x1A'));
-        $this->assertSame(255, Str::cast('0b11111111'));
-        $this->assertSame(true, Str::cast('true'));
-        $this->assertSame(null, Str::cast('null'));
-        $this->assertSame('1_234_567', Str::cast('1_234_567'));
-    }
-
     public function testStartsWith()
     {
         $this->assertSame('foo', Str::startsWith('foobar', 'foo'));

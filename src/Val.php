@@ -4,7 +4,26 @@ namespace Ekok\Utils;
 
 class Val
 {
-    public static function normKey(string $str): string
+    public static function cast(string $value): int|float|bool|string|array|null
+    {
+        $val = trim($value);
+
+        if (preg_match('/^(?:0x[0-9a-f]+|0[0-7]+|0b[01]+)$/i', $val)) {
+            return intval($val, 0);
+        }
+
+        if (is_numeric($val)) {
+            return $val * 1;
+        }
+
+        if (preg_match('/^\w+$/i', $val) && defined($val)) {
+            return constant($val);
+        }
+
+        return $val;
+    }
+
+    public static function normDotKey(string $str): string
     {
         return str_replace('\\.', '.', $str);
     }
@@ -12,8 +31,8 @@ class Val
     public static function dotKeys($key, array &$parts = null, &$nkey = null): bool
     {
         list($nkey, $parts) = is_string($key) && false !== strpos($key, '.') ? array(
-            static::normKey($key),
-            array_map(static::class . '::normKey', preg_split('/(?<!\\\\)\./', $key)),
+            static::normDotKey($key),
+            array_map(static::class . '::normDotKey', preg_split('/(?<!\\\\)\./', $key)),
         ) : array($key, array($key));
 
         return isset($parts[1]);

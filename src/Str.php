@@ -60,25 +60,6 @@ class Str
         return substr($uid, 0, $min);
     }
 
-    public static function cast(string $value): int|float|bool|string|array|null
-    {
-        $val = trim($value);
-
-        if (preg_match('/^(?:0x[0-9a-f]+|0[0-7]+|0b[01]+)$/i', $val)) {
-            return intval($val, 0);
-        }
-
-        if (is_numeric($val)) {
-            return $val * 1;
-        }
-
-        if (preg_match('/^\w+$/i', $val) && defined($val)) {
-            return constant($val);
-        }
-
-        return $val;
-    }
-
     public static function startsWith(string $str, string ...$prefixes): string|null
     {
         return Arr::some($prefixes, static fn(Payload $prefix) => str_starts_with($str, $prefix->value), $match) ? $match : null;
