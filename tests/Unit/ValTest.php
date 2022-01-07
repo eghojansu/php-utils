@@ -7,6 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 class ValTest extends TestCase
 {
+    public function testIsEmpty()
+    {
+        $this->assertTrue(Val::isEmpty(''));
+        $this->assertTrue(Val::isEmpty(null));
+        $this->assertTrue(Val::isEmpty(array()));
+        $this->assertTrue(Val::isEmpty('foo', false));
+    }
+
     public function testRef()
     {
         $source = array(

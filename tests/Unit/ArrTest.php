@@ -101,4 +101,11 @@ class ArrTest extends TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function testIncludes()
+    {
+        $this->assertTrue(Arr::includes(array(1, 2, 3), 1));
+        $this->assertTrue(Arr::includes(array(1, 2, 3), array(1, 3)));
+        $this->assertFalse(Arr::includes(array(1, 2, 3), 4));
+    }
 }

@@ -4,6 +4,11 @@ namespace Ekok\Utils;
 
 class Val
 {
+    public static function isEmpty($val, bool $expected = true): bool
+    {
+        return $expected === (null === $val || '' === $val || (is_countable($val) && 0 === count($val)));
+    }
+
     public static function cast(string $value): int|float|bool|string|array|null
     {
         $val = trim($value);

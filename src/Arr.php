@@ -78,6 +78,13 @@ class Arr
         return true;
     }
 
+    public static function includes(iterable $items, $value, bool $strict = false): bool
+    {
+        $include = fn($value) => is_array($items) ? in_array($value, $items, $strict) : static::some($items, fn(Payload $item) => $strict ? $item->value === $value : $item->value == $value);
+
+        return is_iterable($value) ? static::every($value, fn(Payload $item) => $include($item->value)) : $include($value);
+    }
+
     public static function first(iterable $items, callable $cb)
     {
         $payload = new Payload($items);
