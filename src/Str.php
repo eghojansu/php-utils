@@ -37,6 +37,11 @@ class Str
         return ucfirst(static::caseCamel($text));
     }
 
+    public static function caseTitle(string $text): string
+    {
+        return ucwords(preg_replace('/\h+/', ' ', str_replace(array('_', '-'), ' ', static::caseSnake($text))));
+    }
+
     public static function className(string $fns, bool $snake = false): string
     {
         $className = ltrim(strrchr('\\' . $fns, '\\'), '\\');

@@ -98,6 +98,23 @@ class StrTest extends TestCase
         );
     }
 
+    /** @dataProvider caseTitleProvider */
+    public function testTitleCamel(string $expected, ...$arguments)
+    {
+        $actual = Str::caseTitle(...$arguments);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function caseTitleProvider()
+    {
+        return array(
+            array('Pascal Case', 'pascal_case'),
+            array('Pascal Case', 'Pascal_Case'),
+            array('Pascal Case', 'Pascal-Case'),
+        );
+    }
+
     public function testClassName()
     {
         $this->assertSame('FooBar', Str::className('FooBar'));
