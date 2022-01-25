@@ -27,8 +27,8 @@ class FileTest extends TestCase
         $this->assertTrue(File::touch($file, 'foo'));
         $this->assertSame('foo', file_get_contents($file));
 
-        $expected = array('x');
-        $actual = File::traverse(TEMP_ROOT);
+        $expected = array($file);
+        $actual = array_keys(iterator_to_array(File::traverse(TEMP_ROOT)));
 
         $this->assertSame($expected, $actual);
 
