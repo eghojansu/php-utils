@@ -8,6 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class ArrTest extends TestCase
 {
+    public function testIndexed()
+    {
+        $this->assertTrue(Arr::indexed(array(1,2,3)));
+        $this->assertFalse(Arr::indexed(array('foo' => 1,2,3)));
+    }
+
     public function testEach()
     {
         $src = array('foo', 'bar', 'baz');

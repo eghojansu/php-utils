@@ -4,6 +4,18 @@ namespace Ekok\Utils;
 
 class File
 {
+    public static function traverse(string $path, string $pattern = null): \Iterator
+    {
+        $dir = new \RecursiveDirectoryIterator(
+            $path,
+            \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS
+        );
+        $flat = new \RecursiveIteratorIterator($dir);
+
+        return $pattern ? new \RegexIterator($flat, $pattern) : $flat;
+    }
+
     public static function touch(string $path, string $content = null, int $permissions = 0775): bool
     {
         static::mkdir(dirname($path));

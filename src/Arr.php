@@ -4,6 +4,11 @@ namespace Ekok\Utils;
 
 class Arr
 {
+    public static function indexed(array $items): bool
+    {
+        return $items && is_numeric(implode('', array_keys($items)));
+    }
+
     public static function exists(\ArrayAccess|array $items, $key): bool
     {
         return isset($items[$key]) || (is_array($items) && array_key_exists($key, $items));
