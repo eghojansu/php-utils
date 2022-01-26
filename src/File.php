@@ -4,16 +4,16 @@ namespace Ekok\Utils;
 
 class File
 {
-    public static function traverse(string $path, string $pattern = null): \Iterator
+    public static function traverse(string $path, string $pattern = null, int $matchMode = null): \Iterator
     {
         $dir = new \RecursiveDirectoryIterator(
-            $path,
+            Str::fixslashes($path),
             \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_FILEINFO
             | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS
         );
         $flat = new \RecursiveIteratorIterator($dir);
 
-        return $pattern ? new \RegexIterator($flat, $pattern) : $flat;
+        return $pattern ? new \RegexIterator($flat, $pattern, $matchMode ?? \RegexIterator::MATCH) : $flat;
     }
 
     public static function touch(string $path, string $content = null, int $permissions = 0775): bool
@@ -30,14 +30,13 @@ class File
 
     public static function load(string $file, array $data = null, bool &$exists = null)
     {
-        if ($exists = is_file($file)) {
-            return (static function () {
-                extract(func_get_arg(0));
+        return ($exists = is_file($file)) ? self::loadFile($data ?? array(), $file) : null;
+    }
 
-                return require func_get_arg(1);
-            })($data ?? array(), $file);
-        }
+    private static function loadFile()
+    {
+        extract(func_get_arg(0));
 
-        return null;
+        return require func_get_arg(1);
     }
 }

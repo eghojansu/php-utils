@@ -4,9 +4,6 @@ use Ekok\Utils\Str;
 
 class StrTest extends \Codeception\Test\Unit
 {
-    /** @var \UnitTester */
-    protected $tester;
-
     /** @dataProvider fixslashesProvider */
     public function testFixSlashes(string $expected, ...$arguments)
     {

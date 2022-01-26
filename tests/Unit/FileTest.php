@@ -4,9 +4,6 @@ use Ekok\Utils\File;
 
 class FileTest extends \Codeception\Test\Unit
 {
-    /** @var \UnitTester */
-    protected $tester;
-
     public function testFile()
     {
         $tmp = TEST_TMP . '/file-touch';

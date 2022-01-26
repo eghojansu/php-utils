@@ -4,9 +4,6 @@ use Ekok\Utils\Val;
 
 class ValTest extends \Codeception\Test\Unit
 {
-    /** @var \UnitTester */
-    protected $tester;
-
     public function testIsEmpty()
     {
         $this->assertTrue(Val::isEmpty(''));

@@ -5,9 +5,6 @@ use Ekok\Utils\Payload;
 
 class ArrTest extends \Codeception\Test\Unit
 {
-    /** @var \UnitTester */
-    protected $tester;
-
     public function testIndexed()
     {
         $this->assertTrue(Arr::indexed(array(1,2,3)));
