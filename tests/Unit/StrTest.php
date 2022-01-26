@@ -1,12 +1,12 @@
 <?php
 
-namespace Ekok\Utils\Tests;
-
 use Ekok\Utils\Str;
-use PHPUnit\Framework\TestCase;
 
-class StrTest extends TestCase
+class StrTest extends \Codeception\Test\Unit
 {
+    /** @var \UnitTester */
+    protected $tester;
+
     /** @dataProvider fixslashesProvider */
     public function testFixSlashes(string $expected, ...$arguments)
     {

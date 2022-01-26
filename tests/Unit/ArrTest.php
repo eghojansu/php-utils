@@ -1,13 +1,13 @@
 <?php
 
-namespace Ekok\Utils\Tests;
-
 use Ekok\Utils\Arr;
 use Ekok\Utils\Payload;
-use PHPUnit\Framework\TestCase;
 
-class ArrTest extends TestCase
+class ArrTest extends \Codeception\Test\Unit
 {
+    /** @var \UnitTester */
+    protected $tester;
+
     public function testIndexed()
     {
         $this->assertTrue(Arr::indexed(array(1,2,3)));

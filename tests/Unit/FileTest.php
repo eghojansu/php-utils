@@ -1,15 +1,15 @@
 <?php
 
-namespace Ekok\Utils\Tests;
-
 use Ekok\Utils\File;
-use PHPUnit\Framework\TestCase;
 
-class FileTest extends TestCase
+class FileTest extends \Codeception\Test\Unit
 {
+    /** @var \UnitTester */
+    protected $tester;
+
     public function testFile()
     {
-        $tmp = TEMP_ROOT . '/file-touch';
+        $tmp = TEST_TMP . '/file-touch';
         $file = $tmp . '/test.txt';
 
         if (is_dir($tmp)) {
@@ -28,7 +28,7 @@ class FileTest extends TestCase
         $this->assertSame('foo', file_get_contents($file));
 
         $expected = array($file);
-        $actual = array_keys(iterator_to_array(File::traverse(TEMP_ROOT)));
+        $actual = array_keys(iterator_to_array(File::traverse(TEST_TMP)));
 
         $this->assertSame($expected, $actual);
 
@@ -36,7 +36,7 @@ class FileTest extends TestCase
         $this->assertTrue(File::touch($file, 'bar'));
         $this->assertSame('bar', file_get_contents($file));
 
-        $this->assertSame('ok', File::load(TEST_FIXTURES . '/files/load.php', array('return' => 'ok'), $exists));
+        $this->assertSame('ok', File::load(TEST_DATA . '/files/load.php', array('return' => 'ok'), $exists));
         $this->assertTrue($exists);
         $this->assertNull(File::load('__none__.php', null, $exists));
         $this->assertFalse($exists);

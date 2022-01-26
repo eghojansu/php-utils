@@ -1,12 +1,12 @@
 <?php
 
-namespace Ekok\Utils\Tests;
-
 use Ekok\Utils\Val;
-use PHPUnit\Framework\TestCase;
 
-class ValTest extends TestCase
+class ValTest extends \Codeception\Test\Unit
 {
+    /** @var \UnitTester */
+    protected $tester;
+
     public function testIsEmpty()
     {
         $this->assertTrue(Val::isEmpty(''));
