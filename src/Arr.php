@@ -4,7 +4,7 @@ namespace Ekok\Utils;
 
 class Arr
 {
-    public static function formatTrace(array $trace): array
+    public static function formatTrace(\Throwable|array $trace): array
     {
         return array_map(static function (array $frame) {
             $line = $frame['file'];
@@ -22,7 +22,7 @@ class Arr
             $line .= $frame['function'];
 
             return $line;
-        }, $trace);
+        }, $trace instanceof \Throwable ? $trace->getTrace() : $trace);
     }
 
     public static function indexed(array $items): bool
