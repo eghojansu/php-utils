@@ -5,6 +5,15 @@ use Ekok\Utils\Payload;
 
 class ArrTest extends \Codeception\Test\Unit
 {
+    public function testFormatTrace()
+    {
+        $trace = Arr::formatTrace(debug_backtrace());
+        $expected = __CLASS__ . '->' . __FUNCTION__;
+
+        $this->assertNotEmpty($trace);
+        $this->assertStringEndsWith($expected, $trace[0]);
+    }
+
     public function testIndexed()
     {
         $this->assertTrue(Arr::indexed(array(1,2,3)));

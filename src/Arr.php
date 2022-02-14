@@ -4,6 +4,27 @@ namespace Ekok\Utils;
 
 class Arr
 {
+    public static function formatTrace(array $trace): array
+    {
+        return array_map(static function (array $frame) {
+            $line = $frame['file'];
+
+            if (isset($frame['line'])) {
+                $line .= ':' . $frame['line'];
+            }
+
+            $line .= ' ';
+
+            if (isset($frame['class'])) {
+                $line .= $frame['class'] . $frame['type'];
+            }
+
+            $line .= $frame['function'];
+
+            return $line;
+        }, $trace);
+    }
+
     public static function indexed(array $items): bool
     {
         return $items && is_numeric(implode('', array_keys($items)));
