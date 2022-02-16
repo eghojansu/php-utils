@@ -7,13 +7,17 @@ class Arr
     public static function formatTrace(\Throwable|array $trace): array
     {
         return array_map(static function (array $frame) {
-            $line = $frame['file'];
+            $line = '';
 
-            if (isset($frame['line'])) {
-                $line .= ':' . $frame['line'];
+            if (isset($frame['file'])) {
+                $line .= $frame['file'];
+
+                if (isset($frame['line'])) {
+                    $line .= ':' . $frame['line'];
+                }
+
+                $line .= ' ';
             }
-
-            $line .= ' ';
 
             if (isset($frame['class'])) {
                 $line .= $frame['class'] . $frame['type'];
