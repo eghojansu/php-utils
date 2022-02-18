@@ -37,7 +37,7 @@ class Val
     {
         list($nkey, $parts) = is_string($key) && false !== strpos($key, '.') ? array(
             static::normDotKey($key),
-            array_map(static::class . '::normDotKey', preg_split('/(?<!\\\\)\./', $key)),
+            array_map(static::class . '::normDotKey', preg_split('/(?<!\\\\)\./', $key, -1, PREG_SPLIT_NO_EMPTY)),
         ) : array($key, array($key));
 
         return isset($parts[1]);
@@ -61,10 +61,6 @@ class Val
         }
 
         foreach ($parts as $part) {
-            if ('' === $part) {
-                continue;
-            }
-
             if (null === $var || is_scalar($var)) {
                 $var = array();
             }

@@ -35,8 +35,11 @@ class ValTest extends \Codeception\Test\Unit
         $this->assertSame($source['foo'], Val::ref('foo', $source, false, $exists, $parts));
         $this->assertSame(array('foo'), $parts);
         $this->assertTrue($exists);
-        // get ref with extra dot (invalid)
-        $this->assertSame($source['foo'], Val::ref('foo.', $source));
+
+        // get with extra unused dot
+        $this->assertSame('qux', Val::ref('foo..bar..baz.', $source, false, $exists, $parts));
+        $this->assertSame(array('foo', 'bar', 'baz'), $parts);
+        $this->assertTrue($exists);
 
         $this->assertNull(Val::ref('unknown', $source));
         $this->assertNull(Val::ref(1, $source, false, $exists, $parts));
