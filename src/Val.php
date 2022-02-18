@@ -30,7 +30,7 @@ class Val
 
     public static function normDotKey(string $str): string
     {
-        return str_replace('\\.', '.', $str);
+        return str_replace('\\.', '.', trim($str, ". \t\n\r\0\x0B"));
     }
 
     public static function dotKeys($key, array &$parts = null, &$nkey = null): bool
