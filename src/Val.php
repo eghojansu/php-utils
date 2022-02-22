@@ -28,16 +28,13 @@ class Val
         return $val;
     }
 
-    public static function normDotKey(string $str): string
-    {
-        return str_replace('\\.', '.', trim($str, ". \t\n\r\0\x0B"));
-    }
-
     public static function dotKeys($key, array &$parts = null, &$nkey = null): bool
     {
+        $norm = static fn (string $str) => str_replace('\\.', '.', trim($str, ". \t\n\r\0\x0B"));
+
         list($nkey, $parts) = is_string($key) && false !== strpos($key, '.') ? array(
-            static::normDotKey($key),
-            array_map(static::class . '::normDotKey', preg_split('/(?<!\\\\)\./', $key, -1, PREG_SPLIT_NO_EMPTY)),
+            $norm($key),
+            array_map($norm, preg_split('/(?<!\\\\)\./', $key, -1, PREG_SPLIT_NO_EMPTY)),
         ) : array($key, array($key));
 
         return isset($parts[1]);

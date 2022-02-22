@@ -17,6 +17,7 @@ class StrTest extends \Codeception\Test\Unit
         return array(
             array('/foo/bar', '\\foo//bar'),
             array('foo/bar/', 'foo//bar\\'),
+            array('foo/bar/', 'foo//\\//\\bar\\/'),
             array('', ''),
         );
     }

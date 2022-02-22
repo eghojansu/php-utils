@@ -6,7 +6,11 @@ class Str
 {
     public static function fixslashes(string $str): string
     {
-        return preg_replace('/[\/\\\\]+/', '/', $str);
+        return preg_replace(
+            '/\x00+/',
+            '/',
+            strtr($str, array_fill_keys(array('/', '\\'), chr(0))),
+        );
     }
 
     public static function split(string $str, string $symbols = null): array
@@ -14,12 +18,12 @@ class Str
         return preg_split('/[' . ($symbols ?? ',;|') . ']/i', $str, 0, PREG_SPLIT_NO_EMPTY);
     }
 
-    public static function quote(string $text, string $open = '"', string $close = null, string $delimiter = '.'): string
+    public static function quote(string $text, string $open = '"', string $close = null, string $delim = '.'): string
     {
         $a = $open;
         $b = $close ?? $a;
 
-        return $a . str_replace($delimiter, $b . $delimiter . $a, $text) . $b;
+        return $a . str_replace($delim, $b . $delim . $a, $text) . $b;
     }
 
     public static function caseCamel(string $text): string
@@ -51,14 +55,15 @@ class Str
 
     public static function random(int $len = 8, bool $lower = true, string $salt = null): string
     {
+        $uid = '';
         $min = max(4, min(128, $len));
         $pattern = $lower ? "#(*UTF8)[^A-Za-z0-9]#" : "#(*UTF8)[^A-Z0-9]#";
         $saltiness = $salt ?? bin2hex(random_bytes($len));
 
         do {
             $hex = md5($saltiness . uniqid('', true));
-            $pack = pack('H*', $hex);
-            $tmp = base64_encode($pack);
+            $pck = pack('H*', $hex);
+            $tmp = base64_encode($pck);
             $uid = preg_replace($pattern, '', $tmp);
         } while (strlen($uid) < $min);
 
@@ -67,11 +72,11 @@ class Str
 
     public static function startsWith(string $str, string ...$prefixes): string|null
     {
-        return Arr::some($prefixes, static fn(Payload $prefix) => str_starts_with($str, $prefix->value), $match) ? $match : null;
+        return Arr::some($prefixes, static fn($prefix) => str_starts_with($str, $prefix), $match) ? $match : null;
     }
 
     public static function endsWith(string $str, string ...$suffixes): string|null
     {
-        return Arr::some($suffixes, static fn(Payload $suffix) => str_ends_with($str, $suffix->value), $match) ? $match : null;
+        return Arr::some($suffixes, static fn($suffix) => str_ends_with($str, $suffix), $match) ? $match : null;
     }
 }

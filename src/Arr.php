@@ -6,27 +6,13 @@ class Arr
 {
     public static function formatTrace(\Throwable|array $trace): array
     {
-        return array_map(static function (array $frame) {
-            $line = '';
-
-            if (isset($frame['file'])) {
-                $line .= $frame['file'];
-
-                if (isset($frame['line'])) {
-                    $line .= ':' . $frame['line'];
-                }
-
-                $line .= ' ';
-            }
-
-            if (isset($frame['class'])) {
-                $line .= $frame['class'] . $frame['type'];
-            }
-
-            $line .= $frame['function'];
-
-            return $line;
-        }, $trace instanceof \Throwable ? $trace->getTrace() : $trace);
+        return array_map(
+            static fn (array $frame) => (
+                rtrim(($frame['file'] ?? '') . ':' . ($frame['line'] ?? ''), ':') . ' ' .
+                ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '')
+            ),
+            $trace instanceof \Throwable ? $trace->getTrace() : $trace,
+        );
     }
 
     public static function indexed(array $items): bool
@@ -39,54 +25,47 @@ class Arr
         return isset($items[$key]) || (is_array($items) && array_key_exists($key, $items));
     }
 
-    public static function each(iterable $items, callable $cb, bool $skipNulls = false): array
+    public static function filter(iterable $items, callable $cb): array
     {
-        $payload = new Payload($items);
+        $filtered = array();
 
-        foreach ($payload->items as $key => $value) {
-            $result = $cb($payload->update($value, $key));
-            $update = $result instanceof Payload ? $payload->value : $result;
+        foreach ($items as $key => $value) {
+            if ($cb($value, $key, $items, $filtered)) {
+                $filtered[$key] = $value;
+            }
+        }
 
-            if ($skipNulls && null === $update) {
+        return $filtered;
+    }
+
+    public static function each(iterable $items, callable $cb, bool $ignoreNull = false, bool $indexed = false): array
+    {
+        $result = array();
+
+        foreach ($items as $key => $value) {
+            $update = $cb($value, $key, $items, $result);
+
+            if (null === $update && $ignoreNull) {
                 continue;
             }
 
-            $payload->commit($update);
-        }
-
-        return $payload->result;
-    }
-
-    public static function filter(iterable $items, callable $cb): array
-    {
-        $payload = new Payload($items);
-
-        foreach ($payload->items as $key => $value) {
-            if ($cb($payload->update($value, $key))) {
-                $payload->commit($payload->value);
+            if ($indexed) {
+                $result[] = $update;
+            } else {
+                $result[$key] = $update;
             }
         }
 
-        return $payload->result;
-    }
-
-    public static function walk(iterable $items, callable $cb): void
-    {
-        $payload = new Payload($items);
-
-        foreach ($payload->items as $key => $value) {
-            $cb($payload->update($value, $key));
-        }
+        return $result;
     }
 
     public static function some(iterable $items, callable $cb, &$last = null): bool
     {
-        $payload = new Payload($items);
         $last = null;
 
-        foreach ($payload->items as $key => $value) {
-            if ($cb($payload->update($value, $key))) {
-                $last = $payload->value;
+        foreach ($items as $key => $value) {
+            if ($cb($value, $key, $items)) {
+                $last = $value;
 
                 return true;
             }
@@ -97,34 +76,22 @@ class Arr
 
     public static function every(iterable $items, callable $cb): bool
     {
-        $payload = new Payload($items);
-
-        foreach ($payload->items as $key => $value) {
-            if (!$cb($payload->update($value, $key))) {
+        foreach ($items as $key => $value) {
+            if (!$cb($value, $key, $items)) {
                 return false;
             }
         }
 
-        return true;
-    }
-
-    public static function includes(iterable $items, $value, bool $strict = false): bool
-    {
-        $include = fn($value) => is_array($items) ? in_array($value, $items, $strict) : static::some($items, fn(Payload $item) => $strict ? $item->value === $value : $item->value == $value);
-
-        return is_iterable($value) ? static::every($value, fn(Payload $item) => $include($item->value)) : $include($value);
+        return !!$items;
     }
 
     public static function first(iterable $items, callable $cb)
     {
-        $payload = new Payload($items);
+        foreach ($items as $key => $value) {
+            $result = $cb($value, $key, $items);
 
-        foreach ($payload->items as $key => $value) {
-            $result = $cb($payload->update($value, $key));
-            $update = $result instanceof Payload ? $payload->value : $result;
-
-            if (null !== $update) {
-                return $update;
+            if (null !== $result) {
+                return $result;
             }
         }
 
@@ -133,13 +100,25 @@ class Arr
 
     public static function reduce(iterable $items, callable $cb, $carry = null)
     {
-        $payload = new Payload($items);
+        $result = $carry;
 
-        foreach ($payload->items as $key => $value) {
-            $carry = $cb($carry, $payload->update($value, $key));
+        foreach ($items as $key => $value) {
+            $result = $cb($result, $value, $key, $items);
         }
 
-        return $carry;
+        return $result;
+    }
+
+    public static function includes(iterable $items, $value, bool $strict = false): bool
+    {
+        return static::every(
+            is_iterable($value) ? $value : (array) $value,
+            fn($value) => (
+                is_array($items) ?
+                    in_array($value, $items, $strict) :
+                    static::some($items, fn($item) => $strict ? $item === $value : $item == $value)
+            ),
+        );
     }
 
     public static function merge(iterable|null ...$arrays): array

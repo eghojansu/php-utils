@@ -1,7 +1,6 @@
 <?php
 
 use Ekok\Utils\Arr;
-use Ekok\Utils\Payload;
 
 class ArrTest extends \Codeception\Test\Unit
 {
@@ -20,53 +19,43 @@ class ArrTest extends \Codeception\Test\Unit
         $this->assertFalse(Arr::indexed(array('foo' => 1,2,3)));
     }
 
-    public function testEach()
-    {
-        $src = array('foo', 'bar', 'baz');
-
-        $this->assertEquals($src, Arr::each($src, fn(Payload $item) => $item));
-        $this->assertEquals(array('f', 'b', 'b'), Arr::each($src, fn(Payload $item) => substr($item->value, 0, 1)));
-        $this->assertEquals(array('foo', 'baz'), Arr::each($src, fn(Payload $item) => $item->value === 'bar' ? $item->value(null) : $item->key(null), true));
-    }
-
     public function testFilter()
     {
         $src = array('foo' => 1, 'one');
 
-        $this->assertEquals($src, Arr::filter($src + array('x' => false), fn(Payload $item) => ($item->keyType('string') || $item->valType('string')) && $item->value));
-        $this->assertEquals(array('one'), Arr::filter($src, fn(Payload $item) => $item->indexed()));
+        $this->assertEquals($src, Arr::filter($src + array('x' => false), fn($item, $key) => (is_string($key) || is_string($item)) && $item));
+        $this->assertEquals(array('one'), Arr::filter($src, fn(...$args) => is_numeric($args[1])));
     }
 
-    public function testWalk()
+    public function testEach()
     {
-        $expected = array('foo', 'bar', 'baz');
-        $actual = array();
+        $src = array('foo', 'bar', 'baz');
 
-        Arr::walk($expected, function (Payload $item) use (&$actual) {
-            $actual[] = $item->value;
-        });
-
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($src, Arr::each($src, fn($item) => $item));
+        $this->assertEquals(array('f', 'b', 'b'), Arr::each($src, fn($item) => substr($item, 0, 1)));
+        $this->assertEquals(array('foo', 2 => 'baz'), Arr::each($src, fn($item) => $item === 'bar' ? null : $item, true));
+        $this->assertEquals(array('foo', 'baz'), Arr::each($src, fn($item) => $item === 'bar' ? null : $item, true, true));
     }
 
     public function testSome()
     {
-        $this->assertTrue(Arr::some(array('foo', 'bar'), fn (Payload $item) => $item->value === 'bar', $actual));
+        $this->assertTrue(Arr::some(array('foo', 'bar'), fn ($item) => $item === 'bar', $actual));
         $this->assertEquals('bar', $actual);
-        $this->assertFalse(Arr::some(array('foo', 'bar'), fn (Payload $item) => $item->value === 'baz'));
+        $this->assertFalse(Arr::some(array('foo', 'bar'), fn ($item) => $item === 'baz'));
     }
 
     public function testEvery()
     {
-        $this->assertTrue(Arr::every(array('foo', 'bar'), fn (Payload $item) => !!$item->value));
-        $this->assertFalse(Arr::every(array('foo', 'bar'), fn (Payload $item) => $item->value === 'foo'));
+        $this->assertTrue(Arr::every(array('foo', 'bar'), fn ($item) => !!$item));
+        $this->assertFalse(Arr::every(array('foo', 'bar'), fn ($item) => $item === 'foo'));
+        $this->assertFalse(Arr::every(array(), fn ($item) => $item === 'foo'));
     }
 
     public function testFirst()
     {
         $expected = 'foo';
-        $actual = Arr::first(array('foo', 'bar'), fn(Payload $item) => $item);
-        $second = Arr::first(array(null), fn(Payload $item) => $item);
+        $actual = Arr::first(array('foo', 'bar'), fn($item) => $item);
+        $second = Arr::first(array(null), fn($item) => $item);
 
         $this->assertSame($expected, $actual);
         $this->assertNull($second);
@@ -75,7 +64,7 @@ class ArrTest extends \Codeception\Test\Unit
     public function testReduce()
     {
         $expected = '1,2,3,4,5';
-        $actual = Arr::reduce(range(1, 5), fn ($prev, Payload $item) => $prev . ($item->key > 0 ? ',' : '') . $item->value);
+        $actual = Arr::reduce(range(1, 5), fn ($prev, $item, $key) => $prev . ($key > 0 ? ',' : '') . $item);
 
         $this->assertSame($expected, $actual);
     }
