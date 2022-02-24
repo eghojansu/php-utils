@@ -72,11 +72,11 @@ class Str
 
     public static function startsWith(string $str, string ...$prefixes): string|null
     {
-        return Arr::some($prefixes, static fn($prefix) => str_starts_with($str, $prefix), $match) ? $match : null;
+        return Arr::some($prefixes, static fn($prefix) => str_starts_with($str, $prefix), $match) ? $match[1] : null;
     }
 
     public static function endsWith(string $str, string ...$suffixes): string|null
     {
-        return Arr::some($suffixes, static fn($suffix) => str_ends_with($str, $suffix), $match) ? $match : null;
+        return Arr::some($suffixes, static fn($suffix) => str_ends_with($str, $suffix), $match) ? $match[1] : null;
     }
 }

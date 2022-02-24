@@ -40,7 +40,7 @@ class ArrTest extends \Codeception\Test\Unit
     public function testSome()
     {
         $this->assertTrue(Arr::some(array('foo', 'bar'), fn ($item) => $item === 'bar', $actual));
-        $this->assertEquals('bar', $actual);
+        $this->assertEquals(array(1, 'bar'), $actual);
         $this->assertFalse(Arr::some(array('foo', 'bar'), fn ($item) => $item === 'baz'));
     }
 

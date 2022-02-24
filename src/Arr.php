@@ -59,13 +59,13 @@ class Arr
         return $result;
     }
 
-    public static function some(iterable $items, callable $cb, &$last = null): bool
+    public static function some(iterable $items, callable $cb, array &$last = null): bool
     {
         $last = null;
 
         foreach ($items as $key => $value) {
             if ($cb($value, $key, $items)) {
-                $last = $value;
+                $last = array($key, $value);
 
                 return true;
             }
