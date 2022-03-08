@@ -139,9 +139,9 @@ class Arr
         return array_diff_key($items ?? array(), array_fill_keys($keys, null));
     }
 
-    public static function ensure(array|string $items, string $symbols = null): array
+    public static function ensure(array|string|null $items, string $symbols = null): array
     {
-        return is_string($items) ? Str::split($items, $symbols) : $items;
+        return is_string($items) ? Str::split($items, $symbols) : $items ?? array();
     }
 
     public static function fill(array|string $items, $value = true, string $symbols = null): array

@@ -93,6 +93,7 @@ class ArrTest extends \Codeception\Test\Unit
 
         $this->assertSame($expected, $actual);
         $this->assertSame($expected, $actual2);
+        $this->assertSame(array(), Arr::ensure(null));
     }
 
     public function testFill()
