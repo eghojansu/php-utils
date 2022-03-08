@@ -109,4 +109,18 @@ class ArrTest extends \Codeception\Test\Unit
         $this->assertTrue(Arr::includes(array(1, 2, 3), array(1, 3)));
         $this->assertFalse(Arr::includes(array(1, 2, 3), 4));
     }
+
+    public function testFromHttpAccept()
+    {
+        $accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+        $actual = Arr::fromHttpAccept($accept);
+        $expected = array(
+            array('content' => 'text/html'),
+            array('content' => 'application/xhtml+xml'),
+            array('content' => 'application/xml', 'q' => 0.9),
+            array('content' => '*/*', 'q' => 0.8),
+        );
+
+        $this->assertSame($expected, $actual);
+    }
 }

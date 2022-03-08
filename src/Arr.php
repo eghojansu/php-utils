@@ -148,4 +148,37 @@ class Arr
     {
         return array_fill_keys(static::ensure($items, $symbols), $value);
     }
+
+    public static function fromHttpAccept(string $text, bool $sort = true): array
+    {
+        $accepts = array_map(
+            static function (string $part) {
+                $attrs = array_filter(explode(';', $part), 'trim');
+                $content = array_shift($attrs);
+                $tags = array_reduce($attrs, static function (array $tags, string $attr) {
+                    list($key, $value) = array_map('trim', explode('=', $attr . '='));
+
+                    return $tags + array(
+                        $key => is_numeric($value) ? $value * 1 : $value,
+                    );
+                }, array());
+
+                return compact('content') + $tags;
+            },
+            array_filter(explode(',', $text), 'trim'),
+        );
+
+        return $sort ? self::sortHttpAccept($accepts) : $accepts;
+    }
+
+    public static function sortHttpAccept(array $accepts): array
+    {
+        $sorted = $accepts;
+
+        usort($sorted, static function (array $a, array $b) {
+            return ($b['q'] ?? 1) <=> ($a['q'] ?? 1);
+        });
+
+        return $sorted;
+    }
 }
