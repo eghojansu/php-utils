@@ -33,9 +33,14 @@ class FileTest extends \Codeception\Test\Unit
         $this->assertTrue(File::touch($file, 'bar'));
         $this->assertSame('bar', file_get_contents($file));
 
-        $this->assertSame('ok', File::load(TEST_DATA . '/files/load.php', array('return' => 'ok'), $exists));
-        $this->assertTrue($exists);
-        $this->assertNull(File::load('__none__.php', null, $exists));
-        $this->assertFalse($exists);
+        $this->assertSame('ok', File::load(TEST_DATA . '/files/load.php', array('return' => 'ok')));
+        $this->assertSame('ok', File::load(TEST_DATA . '/files/load.php', array('return' => 'ok'), true, $output));
+        $this->assertSame('', $output);
+        $this->assertSame(null, File::load(TEST_DATA . '/files/none.php'));
+
+        $this->expectException('LogicException');
+        $this->expectExceptionMessageMatches('/Error while loading: .+ No such file or directory at src\\\\File\.php:52/');
+
+        File::load(TEST_DATA . '/files/none.php', null, false);
     }
 }

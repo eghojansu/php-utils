@@ -109,6 +109,18 @@ class Arr
         return $result;
     }
 
+    public static function quoteKeys(array $items, string|array $quote = null): array
+    {
+        $open = $quote[0] ?? '"';
+        $close = $quote[1] ?? $open;
+
+        return static::reduce(
+            $items,
+            static fn(array $arr, $value, $key) => $arr + array($open . $key . $close => $value),
+            array(),
+        );
+    }
+
     public static function includes(iterable $items, $value, bool $strict = false): bool
     {
         return static::every(

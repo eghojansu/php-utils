@@ -124,4 +124,14 @@ class ArrTest extends \Codeception\Test\Unit
 
         $this->assertSame($expected, $actual);
     }
+
+    public function testQuoteKeys()
+    {
+        $actual = Arr::quoteKeys(array('foo' => 'bar'), '{}');
+        $expected = array(
+            '{foo}' => 'bar',
+        );
+
+        $this->assertSame($expected, $actual);
+    }
 }

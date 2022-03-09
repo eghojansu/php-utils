@@ -28,15 +28,45 @@ class File
         return is_dir($path) ? true : mkdir($path, $permissions, $recursive);
     }
 
-    public static function load(string $file, array $data = null, bool &$exists = null)
-    {
-        return ($exists = is_file($file)) ? self::loadFile($data ?? array(), $file) : null;
+    public static function load(
+        string $file,
+        array $data = null,
+        bool $safe = true,
+        string &$output = null,
+    ) {
+        list($result, $output) = static::safeLoad(
+            $data ?? array(),
+            $file,
+            ob_get_level(),
+            !$safe,
+        );
+
+        return $result;
     }
 
-    private static function loadFile()
+    private static function safeLoad(): array
     {
-        extract(func_get_arg(0));
+        try {
+            ob_start();
+            extract(func_get_arg(0)); // data
+            $result = require func_get_arg(1); // file
+            $output = ob_get_clean();
 
-        return require func_get_arg(1);
+            return array($result, $output);
+        } catch (\Throwable $error) {
+            while (ob_get_level() > func_get_arg(2)) { // ob level
+                ob_end_clean();
+            }
+
+            if (func_get_arg(3)) { // throw
+                throw new \LogicException(sprintf(
+                    'Error while loading: %s (%s)',
+                    func_get_arg(1),
+                    $error->getMessage(),
+                ), 0, $error);
+            }
+
+            return array(null, null);
+        }
     }
 }

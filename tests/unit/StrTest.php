@@ -42,10 +42,11 @@ class StrTest extends \Codeception\Test\Unit
     public function testQuote()
     {
         $this->assertSame('"foo"', Str::quote('foo'));
-        $this->assertSame('"foo"."bar"', Str::quote('foo.bar'));
-        $this->assertSame('`foo`.`bar`', Str::quote('foo.bar', '`'));
-        $this->assertSame('[foo]', Str::quote('foo', '[', ']'));
-        $this->assertSame('[foo].[bar]', Str::quote('foo.bar', '[', ']'));
+        $this->assertSame('"foo.bar"', Str::quote('foo.bar'));
+        $this->assertSame('"foo"."bar"', Str::quote('foo.bar', null, '.'));
+        $this->assertSame('`foo`.`bar`', Str::quote('foo.bar', '`', '.'));
+        $this->assertSame('[foo]', Str::quote('foo', '[]'));
+        $this->assertSame('[foo].[bar]', Str::quote('foo.bar', array('[', ']'), '.'));
     }
 
     /** @dataProvider caseSnakeProvider */

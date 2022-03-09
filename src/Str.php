@@ -18,12 +18,16 @@ class Str
         return preg_split('/[' . ($symbols ?? ',;|') . ']/i', $str, 0, PREG_SPLIT_NO_EMPTY);
     }
 
-    public static function quote(string $text, string $open = '"', string $close = null, string $delim = '.'): string
+    public static function quote(string $text, string|array $quote = null, string $split = null): string
     {
-        $a = $open;
-        $b = $close ?? $a;
+        $open = $quote[0] ?? '"';
+        $close = $quote[1] ?? $open;
 
-        return $a . str_replace($delim, $b . $delim . $a, $text) . $b;
+        return $open . (
+            $split ?
+                str_replace($split, $close . $split . $open, $text) :
+                $text
+        ) . $close;
     }
 
     public static function caseCamel(string $text): string
