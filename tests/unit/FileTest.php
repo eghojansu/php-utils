@@ -37,10 +37,21 @@ class FileTest extends \Codeception\Test\Unit
         $this->assertSame('ok', File::load(TEST_DATA . '/files/load.php', array('return' => 'ok'), true, $output));
         $this->assertSame('', $output);
         $this->assertSame(null, File::load(TEST_DATA . '/files/none.php'));
+    }
 
+    public function testLoadFileNotExists()
+    {
         $this->expectException('LogicException');
-        $this->expectExceptionMessageMatches('/Error while loading: .+ No such file or directory at src\\\\File\.php:52/');
+        $this->expectExceptionMessageMatches('/^File not found: .+\/none.php$/');
 
         File::load(TEST_DATA . '/files/none.php', null, false);
+    }
+
+    public function testLoadFileErrorThrown()
+    {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessageMatches('/^Error in file: .+\/error.php \(Error from loaded file\)$/');
+
+        File::load(TEST_DATA . '/files/error.php', null, false);
     }
 }

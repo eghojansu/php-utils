@@ -34,12 +34,15 @@ class File
         bool $safe = true,
         string &$output = null,
     ) {
-        list($result, $output) = static::safeLoad(
+        list($result, $output, $error) = file_exists($file) ? static::safeLoad(
             $data ?? array(),
             $file,
             ob_get_level(),
-            !$safe,
-        );
+        ) : array(null, null, new \LogicException(sprintf('File not found: %s', $file)));
+
+        if ($error && !$safe) {
+            throw $error;
+        }
 
         return $result;
     }
@@ -52,21 +55,17 @@ class File
             $result = require func_get_arg(1); // file
             $output = ob_get_clean();
 
-            return array($result, $output);
+            return array($result, $output, null);
         } catch (\Throwable $error) {
             while (ob_get_level() > func_get_arg(2)) { // ob level
                 ob_end_clean();
             }
 
-            if (func_get_arg(3)) { // throw
-                throw new \LogicException(sprintf(
-                    'Error while loading: %s (%s)',
-                    func_get_arg(1),
-                    $error->getMessage(),
-                ), 0, $error);
-            }
-
-            return array(null, null);
+            return array(null, null, new \RuntimeException(sprintf(
+                'Error in file: %s (%s)',
+                func_get_arg(1),
+                $error->getMessage(),
+            ), 0, $error));
         }
     }
 }
