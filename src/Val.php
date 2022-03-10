@@ -9,6 +9,23 @@ class Val
         return $expected === (null === $val || '' === $val || (is_countable($val) && 0 === count($val)));
     }
 
+    public static function compare($value, $with, bool $strict = true): bool
+    {
+        $compare = $value instanceof \Closure ? $value() : $value;
+
+        return $strict ? $compare === $with : $compare == $with;
+    }
+
+    public static function isTrue($value): bool
+    {
+        return static::compare($value, true);
+    }
+
+    public static function isFalse($value): bool
+    {
+        return static::compare($value, false);
+    }
+
     public static function cast(string $value): int|float|bool|string|array|null
     {
         $val = trim($value);

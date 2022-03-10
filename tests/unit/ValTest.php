@@ -12,6 +12,15 @@ class ValTest extends \Codeception\Test\Unit
         $this->assertTrue(Val::isEmpty('foo', false));
     }
 
+    public function testCompare()
+    {
+        $this->assertFalse(Val::compare(true, false));
+        $this->assertTrue(Val::compare(static fn() => 'foo', 'foo'));
+        $this->assertTrue(Val::compare(true, true));
+        $this->assertTrue(Val::isTrue(fn() => true));
+        $this->assertTrue(Val::isFalse(fn() => false));
+    }
+
     public function testRef()
     {
         $source = array(
