@@ -180,7 +180,7 @@ class Arr
             array_filter(explode(',', $text), 'trim'),
         );
 
-        return $sort ? self::sortHttpAccept($accepts) : $accepts;
+        return $sort ? static::sortHttpAccept($accepts) : $accepts;
     }
 
     public static function sortHttpAccept(array $accepts): array
