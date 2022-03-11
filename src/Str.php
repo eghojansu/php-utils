@@ -4,6 +4,11 @@ namespace Ekok\Utils;
 
 class Str
 {
+    public static function hash(string $text): string
+    {
+        return str_pad(base_convert(substr(sha1($text), -16), 16, 36), 11, '0', STR_PAD_LEFT);
+    }
+
     public static function fixslashes(string $str): string
     {
         return preg_replace(

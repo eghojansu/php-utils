@@ -146,4 +146,10 @@ class StrTest extends \Codeception\Test\Unit
         $this->assertSame('bar', Str::endsWith('foobar', 'foo', 'bar'));
         $this->assertNull(Str::endsWith('foobar', 'foo'));
     }
+
+    public function testHash()
+    {
+        $this->assertSame('1xnmsgr3l2f5f', Str::hash('foo'));
+        $this->assertSame('46yp6ywiun2j', Str::hash(str_repeat('foobar', 77)));
+    }
 }
