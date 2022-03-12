@@ -111,20 +111,6 @@ class ArrTest extends \Codeception\Test\Unit
         $this->assertFalse(Arr::includes(array(1, 2, 3), 4));
     }
 
-    public function testFromHttpAccept()
-    {
-        $accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-        $actual = Arr::fromHttpAccept($accept);
-        $expected = array(
-            array('content' => 'text/html'),
-            array('content' => 'application/xhtml+xml'),
-            array('content' => 'application/xml', 'q' => 0.9),
-            array('content' => '*/*', 'q' => 0.8),
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
     public function testQuoteKeys()
     {
         $actual = Arr::quoteKeys(array('foo' => 'bar'), '{}');
