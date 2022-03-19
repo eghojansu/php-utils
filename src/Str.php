@@ -90,4 +90,9 @@ class Str
     {
         return Arr::some($suffixes, static fn($suffix) => str_ends_with($str, $suffix), $match) ? $match[1] : null;
     }
+
+    public static function equals(string $with, string ...$strings): bool
+    {
+        return Arr::some($strings, static fn($str) => $str === $with || strtolower($str) === $with);
+    }
 }

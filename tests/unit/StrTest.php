@@ -152,4 +152,12 @@ class StrTest extends \Codeception\Test\Unit
         $this->assertSame('1xnmsgr3l2f5f', Str::hash('foo'));
         $this->assertSame('46yp6ywiun2j', Str::hash(str_repeat('foobar', 77)));
     }
+
+    public function testEquals()
+    {
+        $this->assertTrue(Str::equals('foo', 'foo', 'bar'));
+        $this->assertTrue(Str::equals('bar', 'foo', 'bar'));
+        $this->assertFalse(Str::equals('baz', 'foo', 'bar'));
+        $this->assertFalse(Str::equals('foo'));
+    }
 }
