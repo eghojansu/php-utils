@@ -4,6 +4,47 @@ declare(strict_types=1);
 
 namespace Ekok\Utils;
 
+/**
+ * Http utils
+ *
+ * @method static HttpException errorBadRequest(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorUnauthorized(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorPaymentRequired(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorForbidden(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorNotFound(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorMethodNotAllowed(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorNotAcceptable(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorProxyAuthenticationRequired(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorRequestTimeout(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorConflict(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorGone(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorLengthRequired(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorPreconditionFailed(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorPayloadTooLarge(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorUriTooLong(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorUnsupportedMediaType(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorRangeNotSatisfiable(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorExpectationFailed(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorIMATeapot(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorUnprocessableEntity(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorTooEarly(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorUpgradeRequired(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorPreconditionRequired(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorTooManyRequests(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorRequestHeaderFieldsTooLarge(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorUnavailableForLegalReasons(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorInternalServerError(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorNotImplemented(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorBadGateway(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorServiceUnavailable(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorGatewayTimeout(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorHttpVersionNotSupported(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorVariantAlsoNegotiates(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorInsufficientStorage(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorLoopDetected(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorNotExtended(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ * @method static HttpException errorNetworkAuthenticationRequired(string $message = null, array $payload = null, array $headers = null, int $code = 0, \Throwable $previous = null)
+ */
 class Http
 {
     const CONTINUE                        = 100;
@@ -118,6 +159,22 @@ class Http
         self::NETWORK_AUTHENTICATION_REQUIRED => 'Network Authentication Required',
     );
 
+    public static function __callStatic($name, $arguments)
+    {
+        if (
+            preg_match('/^error(.+)$/i', $name, $match)
+            && (
+                defined($name = 'self::' . strtoupper($match[1]))
+                || defined($name = 'self::' . strtoupper(Str::caseSnake($match[1])))
+            )
+            && (($code = constant($name)) >= 400)
+        ) {
+            return self::error($code, ...$arguments);
+        }
+
+        return self::error(500, sprintf('Invalid error call: %s', $name));
+    }
+
     public static function statusText(int $code, bool $safe = true, bool &$exists = null): string
     {
         $exists = isset(self::STATUS[$code]);
@@ -169,5 +226,23 @@ class Http
         $diff = $ts - time();
 
         return gmdate($format ?? \DateTimeInterface::RFC7231, $ts);
+    }
+
+    public static function error(
+        int $statusCode = 500,
+        string $message = null,
+        array $payload = null,
+        array $headers = null,
+        int $code = 0,
+        \Throwable $previous = null,
+    ): HttpException {
+        return new HttpException(
+            $statusCode,
+            $message,
+            $payload,
+            $headers,
+            $code,
+            $previous,
+        );
     }
 }

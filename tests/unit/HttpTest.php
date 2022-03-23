@@ -1,6 +1,7 @@
 <?php
 
 use Ekok\Utils\Http;
+use Ekok\Utils\HttpException;
 
 class HttpTest extends \Codeception\Test\Unit
 {
@@ -55,5 +56,16 @@ class HttpTest extends \Codeception\Test\Unit
 
         $this->assertSame($t2->format($fmt), Http::stamp(-7200, null, $diff));
         $this->assertSame(-7200, $diff);
+    }
+
+    public function testError()
+    {
+        $e500 = Http::error();
+        $e404 = Http::errorNotFound();
+        $eFallback = Http::errorOK();
+
+        $this->assertInstanceOf(HttpException::class, $e500);
+        $this->assertInstanceOf(HttpException::class, $e404);
+        $this->assertInstanceOf(HttpException::class, $eFallback);
     }
 }
