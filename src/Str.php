@@ -93,6 +93,6 @@ class Str
 
     public static function equals(string $with, string ...$strings): bool
     {
-        return Arr::some($strings, static fn($str) => $str === $with || strtolower($str) === $with);
+        return Arr::some($strings, static fn($str) => $str === $with || 0 === strcasecmp($with, $str));
     }
 }
