@@ -28,6 +28,7 @@ class FileTest extends \Codeception\Test\Unit
         $actual = array_keys(iterator_to_array(File::traverse(TEST_TMP)));
 
         $this->assertSame($expected, $actual);
+        $this->assertSame($expected, File::traverseGlob(TEST_TMP . '/*.txt'));
 
         unlink($file);
         $this->assertTrue(File::touch($file, 'bar'));
@@ -53,5 +54,18 @@ class FileTest extends \Codeception\Test\Unit
         $this->expectExceptionMessageMatches('/^Error in file: .+\/error.php \(Error from loaded file\)$/');
 
         File::load(TEST_DATA . '/files/error.php', null, false);
+    }
+
+    public function testClassList()
+    {
+        $actual = File::classList(TEST_PROJECT . '/src/*.php');
+        $expected = array(
+            'Ekok\\Utils\\Arr',
+            'Ekok\\Utils\\File',
+            'Ekok\\Utils\\Str',
+            'Ekok\\Utils\\Val',
+        );
+
+        $this->assertSame($expected, $actual);
     }
 }

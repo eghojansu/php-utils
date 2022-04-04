@@ -6,6 +6,53 @@ namespace Ekok\Utils;
 
 class File
 {
+    public static function classList(string $pattern, int $max = 1, int $flags = 0): array
+    {
+        return array_reduce(
+            self::traverseGlob($pattern, $flags),
+            static fn(array $classes, string $file) => array_merge(
+                $classes,
+                self::classFQNS($file, $max),
+            ),
+            array(),
+        );
+    }
+
+    public static function classFQNS(string $path, int $max = 0): array
+    {
+        $tokens = token_get_all(file_get_contents($path));
+        $founds = array();
+        $ns = null;
+        $count = count($tokens);
+        $ctr = 0;
+        $find = static function (int $token, int &$found) use ($tokens, $count) {
+            for ($i = $found; $i < $count; $i++) {
+                if ($token === $tokens[$i][0]) {
+                    $found = $i + 1;
+
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        for ($i = 1; $i < $count; $i++) {
+            if ($find(T_NAMESPACE, $i) && $find(T_NAME_QUALIFIED, $i)) {
+                $ns = $tokens[$i - 1][1];
+            } elseif ($find(T_CLASS, $i) && $find(T_STRING, $i) && 'self' !== $tokens[$i - 1][1]) {
+                $founds[] = $ns . '\\' . $tokens[$i - 1][1];
+                $ctr++;
+            }
+
+            if ($max > 0 && $ctr === $max) {
+                break;
+            }
+        }
+
+        return $founds;
+    }
+
     public static function traverse(string $path, string $pattern = null, int $matchMode = null): \Iterator
     {
         $dir = new \RecursiveDirectoryIterator(
@@ -16,6 +63,21 @@ class File
         $flat = new \RecursiveIteratorIterator($dir);
 
         return $pattern ? new \RegexIterator($flat, $pattern, $matchMode ?? \RegexIterator::MATCH) : $flat;
+    }
+
+    public static function traverseGlob(string $pattern, int $flags = 0): array
+    {
+        $find = Str::fixslashes($pattern);
+        $base = basename($find);
+
+        return array_reduce(
+            false === strpos($find, '/') ? array() : glob(dirname($find) . '/*', GLOB_ONLYDIR),
+            static fn (array $files, string $dir) => array_merge(
+                $files,
+                self::traverseGlob($dir . '/' . $base, $flags),
+            ),
+            glob($find, $flags),
+        );
     }
 
     public static function touch(string $path, string $content = null, int $permissions = 0775): bool
