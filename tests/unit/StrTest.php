@@ -7,7 +7,7 @@ class StrTest extends \Codeception\Test\Unit
     /** @dataProvider fixslashesProvider */
     public function testFixSlashes(string $expected, ...$arguments)
     {
-        $actual = Str::fixslashes(...$arguments);
+        $actual = Str::fixslash(...$arguments);
 
         $this->assertSame($expected, $actual);
     }
@@ -16,8 +16,9 @@ class StrTest extends \Codeception\Test\Unit
     {
         return array(
             array('/foo/bar', '\\foo//bar'),
-            array('foo/bar/', 'foo//bar\\'),
-            array('foo/bar/', 'foo//\\//\\bar\\/'),
+            array('foo/bar', 'foo//bar\\'),
+            array('foo/bar', 'foo//\\//\\bar\\/'),
+            array('foo/bar/', 'foo//\\//\\bar\\/', false),
             array('', ''),
         );
     }
@@ -123,14 +124,14 @@ class StrTest extends \Codeception\Test\Unit
 
     public function testRandom()
     {
-        $this->assertNotEquals(Str::random(), Str::random());
-        $this->assertNotEquals(Str::random(), Str::random());
-        $this->assertNotEquals(Str::random(), Str::random());
-        $this->assertNotEquals(Str::random(), Str::random());
-        $this->assertNotEquals(Str::random(), Str::random());
-        $this->assertEquals(5, strlen(Str::random(5)));
-        $this->assertTrue(!!preg_match('/[[:lower:]]/', Str::random()));
-        $this->assertTrue(!preg_match('/[[:lower:]]/', Str::random(8, false)));
+        $this->assertNotEquals(Str::rand(), Str::rand());
+        $this->assertNotEquals(Str::rand(), Str::rand());
+        $this->assertNotEquals(Str::rand(), Str::rand());
+        $this->assertNotEquals(Str::rand(), Str::rand());
+        $this->assertNotEquals(Str::rand(), Str::rand());
+        $this->assertEquals(5, strlen(Str::rand(5)));
+        $this->assertTrue(!!preg_match('/[[:lower:]]/', Str::rand()));
+        $this->assertTrue(!preg_match('/[[:lower:]]/', Str::rand(8, false)));
     }
 
     public function testStartsWith()

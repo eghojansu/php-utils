@@ -56,16 +56,23 @@ class FileTest extends \Codeception\Test\Unit
         File::load(TEST_DATA . '/files/error.php', null, false);
     }
 
-    public function testClassList()
+    public function testGetClasses()
     {
-        $actual = File::classList(TEST_PROJECT . '/src/*.php');
+        $actual = File::getClassByScan(TEST_PROJECT . '/src/*.php');
         $expected = array(
             'Ekok\\Utils\\Arr',
+            'Ekok\\Utils\\Call',
+            'Ekok\\Utils\\Context',
             'Ekok\\Utils\\File',
             'Ekok\\Utils\\Str',
             'Ekok\\Utils\\Val',
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function testGetSymbolsNothing()
+    {
+        $this->assertCount(0, File::getSymbols('any'));
     }
 }

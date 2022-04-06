@@ -47,11 +47,11 @@ class Val
         return $val;
     }
 
-    public static function dotKeys($key, array &$parts = null, &$nkey = null): bool
+    public static function dotKeys($key, array &$parts = null, &$normalized = null): bool
     {
         $norm = static fn (string $str) => str_replace('\\.', '.', trim($str, ". \t\n\r\0\x0B"));
 
-        list($nkey, $parts) = is_string($key) && false !== strpos($key, '.') ? array(
+        list($normalized, $parts) = is_string($key) && false !== strpos($key, '.') ? array(
             $norm($key),
             array_map($norm, preg_split('/(?<!\\\\)\./', $key, -1, PREG_SPLIT_NO_EMPTY)),
         ) : array($key, array($key));

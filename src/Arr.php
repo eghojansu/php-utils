@@ -6,14 +6,16 @@ namespace Ekok\Utils;
 
 class Arr
 {
-    public static function formatTrace(\Throwable|array $trace): array
+    public static function formatTrace(\Throwable|array $trace = null, int $flags = null): array
     {
         return array_map(
             static fn (array $frame) => (
                 rtrim(($frame['file'] ?? '') . ':' . ($frame['line'] ?? ''), ':') . ' ' .
                 ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '')
             ),
-            $trace instanceof \Throwable ? $trace->getTrace() : $trace,
+            $trace instanceof \Throwable ? $trace->getTrace() : (
+                $trace ?? array_slice(debug_backtrace($flags ?? DEBUG_BACKTRACE_IGNORE_ARGS), 1)
+            ),
         );
     }
 
@@ -47,7 +49,7 @@ class Arr
         foreach ($items as $key => $value) {
             $update = $cb($value, $key, $items, $result);
 
-            if (null === $update && $ignoreNull) {
+            if ($ignoreNull && null === $update) {
                 continue;
             }
 
@@ -111,18 +113,6 @@ class Arr
         return $result;
     }
 
-    public static function quoteKeys(array $items, string|array $quote = null): array
-    {
-        $open = $quote[0] ?? '"';
-        $close = $quote[1] ?? $open;
-
-        return static::reduce(
-            $items,
-            static fn(array $arr, $value, $key) => $arr + array($open . $key . $close => $value),
-            array(),
-        );
-    }
-
     public static function includes(iterable $items, $value, bool $strict = false): bool
     {
         return static::every(
@@ -132,6 +122,25 @@ class Arr
                     in_array($value, $items, $strict) :
                     static::some($items, fn($item) => $strict ? $item === $value : $item == $value)
             ),
+        );
+    }
+
+    public static function walk(iterable $items, callable $cb): void
+    {
+        foreach ($items as $key => $value) {
+            $cb($value, $key, $items);
+        }
+    }
+
+    public static function quoteKeys(array $items, string|array $quote = null): array
+    {
+        $open = $quote[0] ?? '"';
+        $close = $quote[1] ?? $open;
+
+        return static::reduce(
+            $items,
+            static fn(array $arr, $value, $key) => $arr + array($open . $key . $close => $value),
+            array(),
         );
     }
 
@@ -148,7 +157,7 @@ class Arr
         return $result;
     }
 
-    public static function without(array|null $items, string|int ...$keys): array
+    public static function ignore(array|null $items, string|int ...$keys): array
     {
         return array_diff_key($items ?? array(), array_fill_keys($keys, null));
     }

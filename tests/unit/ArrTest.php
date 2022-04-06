@@ -77,10 +77,10 @@ class ArrTest extends \Codeception\Test\Unit
         $this->assertSame($expected, $actual);
     }
 
-    public function testWithout()
+    public function testIgnore()
     {
         $expected = array('one' => 1, 'three' => 3);
-        $actual = Arr::without(array('one' => 1, 'two' => 2, 'three' => 3), 'two');
+        $actual = Arr::ignore(array('one' => 1, 'two' => 2, 'three' => 3), 'two');
 
         $this->assertSame($expected, $actual);
     }
@@ -119,5 +119,16 @@ class ArrTest extends \Codeception\Test\Unit
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function testWalk()
+    {
+        $last = null;
+
+        Arr::walk(range(1,3), static function ($assign) use (&$last) {
+            $last = $assign;
+        });
+
+        $this->assertSame(3, $last);
     }
 }

@@ -6,25 +6,38 @@ namespace Ekok\Utils;
 
 class File
 {
-    public static function classList(string $pattern, int $max = 1, int $flags = 0): array
+    public static function getClassByScan(string $dir, int $max = 1): array
     {
+        return static::getSymbolsByScan($dir, $max, T_CLASS);
+    }
+
+    public static function getSymbolsByScan(string $dir, int $max = 1, int ...$symbols): array
+    {
+        $fixed = Str::fixslash($dir);
+        $pattern = false === strpos($fixed, '*') ? $fixed . '/*.php' : $fixed;
+
         return array_reduce(
-            self::traverseGlob($pattern, $flags),
-            static fn(array $classes, string $file) => array_merge(
+            static::traverseGlob($pattern),
+            static fn(array $classes, string $filepath) => array_merge(
                 $classes,
-                self::classFQNS($file, $max),
+                static::getSymbols($filepath, $max, ...$symbols),
             ),
             array(),
         );
     }
 
-    public static function classFQNS(string $path, int $max = 0): array
+    public static function getSymbols(string $path, int $max = 0, int ...$symbols): array
     {
+        if (!$symbols) {
+            return array();
+        }
+
         $tokens = token_get_all(file_get_contents($path));
         $founds = array();
         $ns = null;
-        $count = count($tokens);
         $ctr = 0;
+        $count = count($tokens);
+        $wants = count($symbols);
         $find = static function (int $token, int &$found) use ($tokens, $count) {
             for ($i = $found; $i < $count; $i++) {
                 if ($token === $tokens[$i][0]) {
@@ -40,13 +53,19 @@ class File
         for ($i = 1; $i < $count; $i++) {
             if ($find(T_NAMESPACE, $i) && $find(T_NAME_QUALIFIED, $i)) {
                 $ns = $tokens[$i - 1][1];
-            } elseif ($find(T_CLASS, $i) && $find(T_STRING, $i) && 'self' !== $tokens[$i - 1][1]) {
-                $founds[] = $ns . '\\' . $tokens[$i - 1][1];
-                $ctr++;
+
+                continue;
             }
 
-            if ($max > 0 && $ctr === $max) {
-                break;
+            for ($j = 0; $j < $wants; $j++) {
+                if ($find($symbols[$j], $i) && $find(T_STRING, $i) && 'self' !== $tokens[$i - 1][1]) {
+                    $founds[] = $ns . '\\' . $tokens[$i - 1][1];
+                    $ctr++;
+                }
+
+                if ($max > 0 && $max === $ctr) {
+                    break(2);
+                }
             }
         }
 
@@ -56,7 +75,7 @@ class File
     public static function traverse(string $path, string $pattern = null, int $matchMode = null): \Iterator
     {
         $dir = new \RecursiveDirectoryIterator(
-            Str::fixslashes($path),
+            Str::fixslash($path),
             \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_FILEINFO
             | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS
         );
@@ -67,14 +86,14 @@ class File
 
     public static function traverseGlob(string $pattern, int $flags = 0): array
     {
-        $find = Str::fixslashes($pattern);
+        $find = Str::fixslash($pattern);
         $base = basename($find);
 
         return array_reduce(
             false === strpos($find, '/') ? array() : glob(dirname($find) . '/*', GLOB_ONLYDIR),
             static fn (array $files, string $dir) => array_merge(
                 $files,
-                self::traverseGlob($dir . '/' . $base, $flags),
+                static::traverseGlob($dir . '/' . $base, $flags),
             ),
             glob($find, $flags),
         );

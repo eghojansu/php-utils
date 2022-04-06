@@ -11,12 +11,12 @@ class Str
         return str_pad(base_convert(substr(sha1($text), -16), 16, 36), 11, '0', STR_PAD_LEFT);
     }
 
-    public static function fixslashes(string $str): string
+    public static function fixslash(string $str, bool $end = true): string
     {
         return preg_replace(
-            '/\x00+/',
-            '/',
-            strtr($str, array_fill_keys(array('/', '\\'), chr(0))),
+            array('~[\\\/]+~', '~(\x00+' . ($end ? '|[\\\/]$)~' : ')~')),
+            array('/'),
+            $str,
         );
     }
 
@@ -54,7 +54,7 @@ class Str
 
     public static function caseTitle(string $text): string
     {
-        return ucwords(preg_replace('/\h+/', ' ', str_replace(array('_', '-'), ' ', static::caseSnake($text))));
+        return ucwords(preg_replace('/[\h\-_]+/', ' ', static::caseSnake($text)));
     }
 
     public static function className(string $fns, bool $snake = false): string
@@ -64,7 +64,7 @@ class Str
         return $snake ? static::caseSnake($className) : $className;
     }
 
-    public static function random(int $len = 8, bool $lower = true, string $salt = null): string
+    public static function rand(int $len = 8, bool $lower = true, string $salt = null): string
     {
         $uid = '';
         $min = max(4, min(128, $len));
