@@ -161,4 +161,9 @@ class StrTest extends \Codeception\Test\Unit
         $this->assertFalse(Str::equals('baz', 'foo', 'bar'));
         $this->assertFalse(Str::equals('foo'));
     }
+
+    public function testLimit()
+    {
+        $this->assertSame('foo...', Str::limit('foobar', 3));
+    }
 }

@@ -6,6 +6,11 @@ namespace Ekok\Utils;
 
 class Str
 {
+    public static function limit(string $text, int $length = 80, string $append = null): string
+    {
+        return substr($text, 0, $length) . (strlen($text) > $length ? ($append ?? '...') : '');
+    }
+
     public static function hash(string $text): string
     {
         return str_pad(base_convert(substr(sha1($text), -16), 16, 36), 11, '0', STR_PAD_LEFT);
