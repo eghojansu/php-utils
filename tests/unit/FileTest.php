@@ -65,6 +65,7 @@ class FileTest extends \Codeception\Test\Unit
             'Ekok\\Utils\\Context',
             'Ekok\\Utils\\File',
             'Ekok\\Utils\\Str',
+            'Ekok\\Utils\\Time',
             'Ekok\\Utils\\Val',
         );
 

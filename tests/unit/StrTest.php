@@ -130,8 +130,8 @@ class StrTest extends \Codeception\Test\Unit
         $this->assertNotEquals(Str::rand(), Str::rand());
         $this->assertNotEquals(Str::rand(), Str::rand());
         $this->assertEquals(5, strlen(Str::rand(5)));
-        $this->assertTrue(!!preg_match('/[[:lower:]]/', Str::rand()));
-        $this->assertTrue(!preg_match('/[[:lower:]]/', Str::rand(8, false)));
+        $this->assertTrue(!!preg_match('/[\w]+/', Str::rand()));
+        $this->assertTrue(!preg_match('/[[:lower:]]+/', Str::rand(8, false)));
     }
 
     public function testStartsWith()
