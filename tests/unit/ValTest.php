@@ -171,4 +171,25 @@ class ValTest extends \Codeception\Test\Unit
         $this->assertSame(null, Val::cast('null'));
         $this->assertSame('1_234_567', Val::cast('1_234_567'));
     }
+
+    public function testAccess()
+    {
+        $obj = new class {
+            public function getFoo() {}
+            public function isFooBar() {}
+            public function setBar() {}
+        };
+
+        $this->assertFalse(Val::access($obj, 'none'));
+        $this->assertTrue(Val::access($obj, 'foo', $method));
+        $this->assertSame('getfoo', $method);
+
+        $this->assertTrue(Val::access($obj, 'foo_bar', $method));
+        $this->assertSame('isFooBar', $method);
+
+        $this->assertTrue(Val::access($obj, 'bar', $method, true, true));
+        $this->assertSame('setbar', $method);
+
+        $this->assertFalse(Val::access($obj, 'bar'));
+    }
 }

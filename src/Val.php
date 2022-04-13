@@ -121,4 +121,26 @@ class Val
             unset($var->$leaf);
         }
     }
+
+    public static function access(
+        string|object $obj,
+        string $key,
+        string &$method = null,
+        bool $read = true,
+        bool $write = false,
+    ): bool {
+        $case = Str::casePascal($key);
+        $method = Arr::first(
+            array_merge(
+                $read ? array('get', 'is', 'has') : array(),
+                $write ? array('set') : array(),
+            ),
+            static fn (string $method) => (
+                method_exists($obj, $found = $method . $key)
+                || method_exists($obj, $found = $method . $case)
+            ) ? $found : null,
+        );
+
+        return !!$method;
+    }
 }
